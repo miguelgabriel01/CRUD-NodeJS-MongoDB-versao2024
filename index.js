@@ -1,4 +1,7 @@
-// Configuração inicial
+//Configuração de .env
+require('dotenv').config();
+
+// Configuração de dependencias
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -22,8 +25,8 @@ app.get('/', (req,res) => {
 });
 
 //conectar com o banco de dados
-const DB_USER = 'gabrielogabriel10';
-const DB_PASSWORD = encodeURIComponent('Bolso22');
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD);
 
 mongoose.connect(`mongodb+srv://${DB_USER}:${DB_PASSWORD}@cluster0.tytdwc2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`).then(() => {
     // fornecer uma porta para acesso
