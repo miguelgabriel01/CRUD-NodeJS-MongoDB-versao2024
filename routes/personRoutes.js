@@ -127,4 +127,27 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+// Deletar pessoa
+router.delete('/:id', async (req, res) => {
+    const id = req.params.id;
+
+    // Verifica se o ID é um ObjectId válido
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+    }
+
+    try {
+        const person = await Person.findOne({ _id: id });
+
+        if (!person) {
+            return res.status(404).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+        }
+
+        await Person.deleteOne({ _id: id });
+        res.status(200).json({ message: "O usuário foi removido com sucesso." });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
