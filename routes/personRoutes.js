@@ -73,4 +73,32 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+
+// Atualizar usuário
+router.patch('/:id', async (req,res) => {
+    const id = req.params.id;
+    const {name, salary, approved} = req.body;
+    const person = {name, salary, approved,};
+
+    // Verifica se o ID é um ObjectId válido
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+    }
+
+    try{
+        const updatedPerson = await Person.updateOne({_id: id}, person);
+
+        if(updatedPerson.matchedCount === 0){
+            return res.status(422).json({ message: "Dados do usuário não foram atualizados." });
+            return;
+        }
+
+        res.status(200).json(person);
+    }catch(error){
+        res.status(500).json({error: error});
+    }
+
+}); 
+
+
 module.exports = router;
