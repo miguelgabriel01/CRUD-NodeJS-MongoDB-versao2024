@@ -57,14 +57,14 @@ router.get('/:id', async (req, res) => {
 
     // Verifica se o ID é um ObjectId válido
     if (!ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+        return res.status(404).json({ message: "O ID fornecido não corresponde a nenhuma pessoa cadastrada no sistema." });
     }
 
     try {
         const person = await Person.findOne({ _id: id });
 
         if (!person) {
-            return res.status(422).json({ message: "O usuário não foi encontrado." });
+            return res.status(404).json({ message: "O ID fornecido não corresponde a nenhuma pessoa cadastrada no sistema." });
         }
 
         res.status(200).json(person);
@@ -81,7 +81,7 @@ router.patch('/:id', async (req, res) => {
 
     // Verifica se o ID é um ObjectId válido
     if (!ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+        return res.status(404).json({ message: "O ID fornecido não corresponde a nenhuma pessoa cadastrada no sistema." });
     }
 
     // Verifica se pelo menos um dos campos está presente e tem a tipagem correta
@@ -133,14 +133,14 @@ router.delete('/:id', async (req, res) => {
 
     // Verifica se o ID é um ObjectId válido
     if (!ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+        return res.status(404).json({ message: "O ID fornecido não corresponde a nenhuma pessoa cadastrada no sistema." });
     }
 
     try {
         const person = await Person.findOne({ _id: id });
 
         if (!person) {
-            return res.status(404).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+            return res.status(404).json({ message: "O ID fornecido não corresponde a nenhuma pessoa cadastrada no sistema." });
         }
 
         await Person.deleteOne({ _id: id });
