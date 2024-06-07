@@ -75,30 +75,56 @@ router.get('/:id', async (req, res) => {
 
 
 // Atualizar usuário
-router.patch('/:id', async (req,res) => {
+router.patch('/:id', async (req, res) => {
     const id = req.params.id;
-    const {name, salary, approved} = req.body;
-    const person = {name, salary, approved,};
+    const { name, salary, approved } = req.body;
 
     // Verifica se o ID é um ObjectId válido
     if (!ObjectId.isValid(id)) {
         return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
     }
 
-    try{
-        const updatedPerson = await Person.updateOne({_id: id}, person);
+    // Verifica se pelo menos um dos campos está presente e tem a tipagem correta
+    const isValidString = (value) => typeof value === 'string' && value.trim() !== '';
+    const isValidNumber = (value) => typeof value === 'number' && !isNaN(value);
+    const isValidBoolean = (value) => typeof value === 'boolean';
 
-        if(updatedPerson.matchedCount === 0){
-            return res.status(422).json({ message: "Dados do usuário não foram atualizados." });
-            return;
+    const updates = {};
+    if (name !== undefined) {
+        if (!isValidString(name)) {
+            return res.status(400).json({ message: "O campo 'name' deve ser uma string não vazia." });
         }
-
-        res.status(200).json(person);
-    }catch(error){
-        res.status(500).json({error: error});
+        updates.name = name;
+    }
+    if (salary !== undefined) {
+        if (!isValidNumber(salary)) {
+            return res.status(400).json({ message: "O campo 'salary' deve ser um número." });
+        }
+        updates.salary = salary;
+    }
+    if (approved !== undefined) {
+        if (!isValidBoolean(approved)) {
+            return res.status(400).json({ message: "O campo 'approved' deve ser um booleano." });
+        }
+        updates.approved = approved;
     }
 
-}); 
+    // Verifica se há pelo menos um campo para atualizar
+    if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "Pelo menos um campo (name, salary, approved) deve ser fornecido para atualização." });
+    }
 
+    try {
+        const updatedPerson = await Person.updateOne({ _id: id }, { $set: updates });
+
+        if (updatedPerson.matchedCount === 0) {
+            return res.status(422).json({ message: "Dados do usuário não foram atualizados." });
+        }
+
+        res.status(200).json({ updates });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 module.exports = router;
