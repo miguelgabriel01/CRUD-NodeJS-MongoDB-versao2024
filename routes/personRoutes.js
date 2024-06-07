@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const Person  = require('../models/Person');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 // Cadastrar pessoa no sistema
 router.post('/', async (req, res) => {
@@ -46,6 +48,28 @@ router.get('/', async (req, res) => {
         res.status(200).json(people);
     }catch(error){
         res.status(500).json({error: error});
+    }
+});
+
+// Listar pessoa especifica
+router.get('/:id', async (req, res) => {
+    const id = req.params.id;
+
+    // Verifica se o ID é um ObjectId válido
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "O ID fornecido não corresponde a nenhum usuário cadastrado no sistema." });
+    }
+
+    try {
+        const person = await Person.findOne({ _id: id });
+
+        if (!person) {
+            return res.status(422).json({ message: "O usuário não foi encontrado." });
+        }
+
+        res.status(200).json(person);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
